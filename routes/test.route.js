@@ -11,4 +11,6 @@ app.post('/addrequest' , myCntrl.createRequest)
 
 app.get('/allrequests' , myCntrl.getAllRequests)
 
+app.delete('/remove/:_id')
+
 }
