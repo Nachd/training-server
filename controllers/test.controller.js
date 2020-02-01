@@ -3,7 +3,9 @@ const RequestType = require('../models/request-type.model');
 const Request = require('../models/request.model');
 const User = require('../models/user.model');
 
-
+const nodemailer = require('nodemailer')
+var myemail = "nourhene.amara@gmail.com";
+var pass = "";
 
 exports.testFn = (req, res) => {
 
@@ -79,4 +81,44 @@ exports.getAllRequests = (req, res) => {
         .then(result => {
             res.send(result)
         })
+}
+
+exports.sendMail = (req , res)=>{
+    // 1 - transporteur
+    var email = req.body.email;
+    var content = req.body.content;
+    var transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        auth: {
+            user: myemail,
+            pass: pass
+        },
+        secureConnection: true,
+        tls: {
+            ciphers: 'SSLv3'
+        }
+    });
+
+    // 2- Mail content
+    var mailOptions = {
+        from: 'nourhene.amara@gmail.com',
+        to: email,
+        subject: 'test mail',
+        text: content,
+        html: '<a href="http://localhost:4200">click here </a>'
+    };
+ 
+
+    // 3 - send mail
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+            res.send({message: info.response})
+        }
+    });
+
 }

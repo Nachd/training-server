@@ -3,6 +3,8 @@ var express = require('express')
 var bodyParser = require('body-parser')
 var cors = require('cors');
 var mongoose = require('mongoose');
+const  multipart  =  require('connect-multiparty');
+const  multipartMiddleware  =  multipart({ uploadDir:  './uploads' });
 
 //config
 
@@ -10,6 +12,11 @@ var mongoose = require('mongoose');
 const app = express();
 app.use(cors());
 app.use(bodyParser.json()); //{limit: '50mb'}
+app.use(bodyParser.urlencoded({
+    limit : '50mb',
+    extended: true
+}));
+app.use(express.static('./'));
 
 //connect to db 
 mongoose.connect('mongodb://127.0.0.1:27017/training' , { useNewUrlParser: true})
@@ -24,7 +31,7 @@ require('./routes/test.route')(app)
 
 //socket io
 var http = require('http');
-var server = http.Server();
+var server = http.Server(app);
 
 //socket io initialization
 var socketIO = require('socket.io');
@@ -43,7 +50,12 @@ console.log('socket connected')
 
 })
 
-
+//
+app.post('/upload', multipartMiddleware, (req, res) => {
+    var file = req.files.uploads;
+    console.log(file)
+    res.send(file[0])
+});
 
 
 //run

@@ -13,4 +13,5 @@ app.get('/allrequests' , myCntrl.getAllRequests)
 
 app.delete('/remove/:_id')
 
+app.post('/sendmail' , myCntrl.sendMail)
 }
