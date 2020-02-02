@@ -2,7 +2,7 @@ const Test = require('../models/test.model')
 const RequestType = require('../models/request-type.model');
 const Request = require('../models/request.model');
 const User = require('../models/user.model');
-
+const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer')
 var myemail = "nourhene.amara@gmail.com";
 var pass = "";
@@ -32,11 +32,48 @@ exports.testFn = (req, res) => {
 }
 
 exports.createUser = (req, res) => {
-    var u = new User(req.body)
+   if(!req.body){
+       return res.status(500)
+   }
+    const newUser = new User(req.body)
+    //1- test if email exist
+    User.findOne({email : req.body.email} , (err , userResult)=>{
+        if(userResult){
+           // res.send({"error" : "email exist"})
+          return res.status(403).send({"error" : "email exist"})
+        }
+        //generate hash
+        bcrypt.genSalt(10 , (saltErr , key)=>{
+            bcrypt.hash(req.body.password , key , (hashErr , hashPass)=>{
+                console.log(hashPass)
+                newUser.password = hashPass;
+                newUser.save((saveErr , SavedUser)=>{
+                    if(saveErr){
+                        return res.status(500)
+                    }
+                    //Send Mail
+                    res.send(SavedUser)
+                })
+            })
+        })
 
-    u.save((err, result) => {
-        res.send(result)
-        // res.sendStatus(403)
+    })
+}
+
+exports.login = (req , res)=>{
+    User.findOne({email : req.body.email} , (err , userResult)=>{
+        //1- test email
+        if(!userResult){
+            return res.status(403).send({"error" : "invalid_email"})
+        }
+        // 2 - test password
+
+        bcrypt.compare(req.body.password , userResult.password , (compareErr , validPass)=>{
+            if(!validPass){
+                return res.status(403).send({"error" : "invalid_passowrd"})
+            }
+            res.send(userResult)
+        })
     })
 }
 
