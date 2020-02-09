@@ -159,3 +159,16 @@ exports.sendMail = (req , res)=>{
     });
 
 }
+
+exports.getAllUsers = (req,res)=>{
+    User.find({})
+    .populate({
+        path : 'CategID',
+        populate({
+            path
+        })
+    })
+    .then(data=>{
+        res.send(data)
+    })
+}

@@ -14,6 +14,7 @@ app.delete('/remove/:_id')
 
 app.post('/sendmail' , myCntrl.sendMail)
 
+app.get('/users' , myCntrl.getAllUsers);
 
 // auth routes
 app.post('/adduser' , myCntrl.createUser)
